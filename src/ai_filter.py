@@ -35,10 +35,9 @@ Example of correct output:
 
 def call_groq(messages, max_tokens=600, temperature=0.1, retries=3):
     """Call Groq API with retry logic."""
-    api_key = os.environ.get("GROQ_API_KEY")
+    api_key = os.environ.get("GROQ_API_KEY", "")
     if not api_key:
         raise ValueError("GROQ_API_KEY environment variable not set")
-
     for attempt in range(retries):
         try:
             response = httpx.post(
