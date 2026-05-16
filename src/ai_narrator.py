@@ -94,8 +94,7 @@ def build_payload(items):
 
 def generate_narrative(items):
     """Use Gemini 2.5 Flash to write the full report narrative."""
-    api_key = os.environ.get("GEMINI_API_KEY", "AIzaSyCCd5JZ8rB9dB75QgWsKauK7CiAerPCAzk
-")
+    api_key = os.environ.get("GEMINI_API_KEY", "")
     if not api_key:
         print("    [WARN] GEMINI_API_KEY not set — skipping narrative generation")
         return None
