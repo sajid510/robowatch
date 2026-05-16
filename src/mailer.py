@@ -109,8 +109,8 @@ def load_subscribers():
 
 def send_report(html_body, item_count=0):
     """Send the report to all subscribers via Gmail SMTP."""
-    sender = os.environ.get("GMAIL_ADDRESS", "sadnansajid355@gmail.com")
-    password = os.environ.get("GMAIL_APP_PASSWORD", "djczbxgpnjsjszlg")
+    sender = os.environ.get("GMAIL_ADDRESS", "")
+    password = os.environ.get("GMAIL_APP_PASSWORD", "")
 
     if not sender or not password:
         print("  [ERROR] Gmail credentials not set in environment variables")
