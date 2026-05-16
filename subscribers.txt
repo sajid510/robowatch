@@ -1,0 +1,8 @@
+# RoboWatch Subscribers
+# Add one email per line
+# Lines starting with # are ignored
+# Commit and push after adding emails
+
+sadnansajid355@gmail.com
+sajidmondol57@gmail.com
+23208149@uap-bd.edu
