@@ -12,7 +12,7 @@ rss_feeds:
       category: "industry"
     - url: "https://news.google.com/rss/search?q=autonomous+robotics+breakthrough&hl=en-US&gl=US&ceid=US:en"
       category: "industry"
-    - url: "https://news.google.com/rss/search?q=SLAM+robotics+2025&hl=en-US&gl=US&ceid=US:en"
+    - url: "https://news.google.com/rss/search?q=SLAM+robotics+2026&hl=en-US&gl=US&ceid=US:en"
       category: "industry"
 
   research:
@@ -20,39 +20,39 @@ rss_feeds:
       category: "research"
     - url: "https://arxiv.org/rss/cs.CV"
       category: "research"
-    - url: "https://news.google.com/rss/search?q=robotics+research+paper+2025&hl=en-US&gl=US&ceid=US:en"
+    - url: "https://news.google.com/rss/search?q=robotics+research+paper+2026&hl=en-US&gl=US&ceid=US:en"
       category: "research"
 
   competitions:
     - url: "https://devpost.com/hackathons.atom?challenge_type=hardware"
       category: "competition"
-    - url: "https://news.google.com/rss/search?q=robotics+competition+2025+undergraduate&hl=en-US&gl=US&ceid=US:en"
+    - url: "https://news.google.com/rss/search?q=robotics+competition+2026+undergraduate&hl=en-US&gl=US&ceid=US:en"
       category: "competition"
-    - url: "https://news.google.com/rss/search?q=robot+hackathon+2025+international&hl=en-US&gl=US&ceid=US:en"
+    - url: "https://news.google.com/rss/search?q=robot+hackathon+2026+international&hl=en-US&gl=US&ceid=US:en"
       category: "competition"
-    - url: "https://news.google.com/rss/search?q=ABU+Robocon+2025&hl=en-US&gl=US&ceid=US:en"
+    - url: "https://news.google.com/rss/search?q=ABU+Robocon+2026&hl=en-US&gl=US&ceid=US:en"
       category: "competition"
 
   conferences:
-    - url: "https://news.google.com/rss/search?q=robotics+conference+call+for+papers+2025&hl=en-US&gl=US&ceid=US:en"
+    - url: "https://news.google.com/rss/search?q=robotics+conference+call+for+papers+2026&hl=en-US&gl=US&ceid=US:en"
       category: "conference"
-    - url: "https://news.google.com/rss/search?q=ICRA+IROS+2025+workshop&hl=en-US&gl=US&ceid=US:en"
+    - url: "https://news.google.com/rss/search?q=ICRA+IROS+2026+workshop&hl=en-US&gl=US&ceid=US:en"
       category: "conference"
 
   fellowships:
-    - url: "https://news.google.com/rss/search?q=robotics+fellowship+grant+undergraduate+2025&hl=en-US&gl=US&ceid=US:en"
+    - url: "https://news.google.com/rss/search?q=robotics+fellowship+grant+undergraduate+2026&hl=en-US&gl=US&ceid=US:en"
       category: "fellowship"
-    - url: "https://news.google.com/rss/search?q=robotics+internship+open+international+students+2025&hl=en-US&gl=US&ceid=US:en"
+    - url: "https://news.google.com/rss/search?q=robotics+internship+open+international+students+2026&hl=en-US&gl=US&ceid=US:en"
       category: "fellowship"
 
   bangladesh:
     - url: "https://news.google.com/rss/search?q=robotics+Bangladesh&hl=en-BD&gl=BD&ceid=BD:en"
       category: "bangladesh"
-    - url: "https://news.google.com/rss/search?q=robot+competition+Bangladesh+2025&hl=en-BD&gl=BD&ceid=BD:en"
+    - url: "https://news.google.com/rss/search?q=robot+competition+Bangladesh+2026&hl=en-BD&gl=BD&ceid=BD:en"
       category: "bangladesh"
     - url: "https://news.google.com/rss/search?q=BUET+KUET+UAP+robotics+competition&hl=en-BD&gl=BD&ceid=BD:en"
       category: "bangladesh"
-    - url: "https://news.google.com/rss/search?q=IUT+RUET+DIU+robotics+2025&hl=en-BD&gl=BD&ceid=BD:en"
+    - url: "https://news.google.com/rss/search?q=IUT+RUET+DIU+robotics+2026&hl=en-BD&gl=BD&ceid=BD:en"
       category: "bangladesh"
     - url: "https://news.google.com/rss/search?q=Bangladesh+technology+competition+student&hl=en-BD&gl=BD&ceid=BD:en"
       category: "bangladesh"
