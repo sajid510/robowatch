@@ -60,7 +60,14 @@ EMAIL_CSS = """
   .footer { text-align: center; color: #333; font-size: 11px;
             margin-top: 24px; padding-top: 16px;
             border-top: 1px solid #1e1e3f; line-height: 1.8; }
-  a { color: #7ec8e3; }
+  a { color: #7ec8e3; } 
+  .cfp-card { border-color: #9b59b6 !important; background: #160d20; }
+  .cfp-table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; }
+  .cfp-table td { padding: 6px 10px; border-bottom: 1px solid #1e1e3f; color: #ccc; }
+  .cfp-table td:first-child { color: #888; width: 42%; }
+  .cfp-action { background: #0a1f10; border: 1px solid #27ae60; border-radius: 6px;
+                padding: 8px 12px; margin: 10px 0; color: #2ecc71; font-size: 13px; font-weight: 600; }
+  .badge-CFP { background: #9b59b6; }
 </style>
 """
 
