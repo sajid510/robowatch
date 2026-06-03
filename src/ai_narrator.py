@@ -39,12 +39,45 @@ STRUCTURE (use exactly these section headers as <h2> tags):
 6. "🇧🇩 Bangladesh Robotics Scene"
    Items with category 'bangladesh'. Write a 1-2 sentence connective intro before the cards.
 
-7. "✅ Team Action Checklist"
+7. "📝 Paper Submission Tracker"
+   Items with category 'cfp'. This section is critical — Niyari is preparing to publish
+   their first conference paper on a two-layer autonomous indoor mobile robot
+   (ROS2 + Jetson Nano + SLAM + Zenoh/VPN architecture).
+
+   Open with 1-2 sentences on the submission landscape this week.
+
+   For each CFP item use this card format:
+   <div class="card cfp-card PRIORITY">
+     <div class="card-header">
+       <span class="badge badge-PRIORITY">FIT: SCORE/10</span>
+       <span class="score">📝 CFP</span>
+     </div>
+     <h3><a href="URL">CFP_NAME — FULL_NAME</a></h3>
+     <p class="summary">SUMMARY</p>
+     <table class="cfp-table">
+       <tr><td>📅 Submission Deadline</td><td><strong>DEADLINE or TBA</strong></td></tr>
+       <tr><td>🗓️ Conference Date</td><td>CONFERENCE_DATE or TBA</td></tr>
+       <tr><td>📍 Venue</td><td>LOCATION</td></tr>
+       <tr><td>📄 Submission Type</td><td>SUBMISSION_TYPE or Unknown</td></tr>
+       <tr><td>💰 Fee</td><td>FEE or Unknown — check official site</td></tr>
+     </table>
+     <div class="cfp-action">⚡ Action: ACTION</div>
+     <p class="reasoning"><em>Why it fits: REASONING</em></p>
+   </div>
+
+   Sort by score descending (highest fit first).
+   Flag items with deadline within 60 days with 🔴 URGENT in the title.
+   Mark BD-based venues with 🇧🇩.
+   End this section with a short <p class="reasoning"> paragraph:
+   "📌 Strategy Note:" — which venue should Niyari target FIRST given the project
+   is currently in implementation phase (not yet paper-written)?
+
+8. "✅ Team Action Checklist"
    A <div class="checklist"><ul> with 4-6 specific, concrete action items for this week.
    Base these on HIGH priority items. Each item should name a specific action
    (e.g. "Register for X before May 30", "Read arXiv paper Y on SLAM", "Try ROS2 package Z").
 
-8. "🔍 Quick Scan"
+9. "🔍 Quick Scan"
    LOW priority items as compact one-liner cards with just title link + source + date.
    No full card format needed here.
 
