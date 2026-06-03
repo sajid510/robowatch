@@ -151,3 +151,82 @@ def enrich_all(items):
     enriched.sort(key=lambda i: (i.get("priority") != "HIGH", -(i.get("score") or 0)))
     print(f"    Enrichment complete: {len(enriched)} items processed")
     return enriched
+  # ── CFP-SPECIFIC ENRICHMENT ───────────────────────────────────────────────────
+# Appended below existing enrich_all — existing code is untouched.
+
+CFP_ENRICH_SYSTEM = """You are a research publication advisor for Niyari, a final-year EEE
+student in Bangladesh preparing their first conference paper on an autonomous indoor mobile robot.
+
+The robot project (Team Supersonic) uses:
+- Jetson Nano edge compute + Arduino Mega 2560 real-time controller
+- RPLidar A1M8, Microsoft Kinect depth camera, MPU6050 IMU
+- ROS 2 Humble, Nav2, SLAM Toolbox, Docker containers
+- Zenoh middleware over Tailscale VPN (replacing DDS across network boundaries)
+- Two-layer architecture: onboard edge layer + remote compute layer on laptop
+
+Research angles: sensor fusion for low-cost platforms, edge-cloud compute partitioning,
+GPS-denied indoor navigation, reliable pub/sub over VPN-tunnelled networks.
+
+For the given conference/CFP item, return ONLY a valid JSON object with these fields:
+{
+  "summary": "2-3 sentences: what this venue is, its scope, and why it fits this specific project",
+  "fit_score": <integer 1-10>,
+  "fit_reasoning": "one sentence: which aspect of the project fits this venue",
+  "submission_deadline": "extracted deadline or TBA",
+  "conference_date": "when conference takes place or TBA",
+  "venue_location": "City, Country or Online",
+  "submission_type": "e.g. Full paper 8 pages IEEE / Extended abstract 2 pages / Talk proposal",
+  "paper_fee": "fee info or Unknown — check official site",
+  "action": "the single most important next step for the student right now"
+}
+No markdown. No text outside the JSON."""
+
+
+def enrich_cfp_item(item):
+    """CFP-specific AI enrichment using the project context prompt."""
+    prompt = (
+        f"Conference name: {item.get('cfp_name', item.get('title', ''))}\n"
+        f"Full name: {item.get('title', '')}\n"
+        f"Known venue: {item.get('cfp_venue', 'Unknown')}\n"
+        f"Known deadline: {item.get('cfp_known_deadline', 'Unknown')}\n"
+        f"Content: {item.get('raw_text', '')[:1000]}"
+    )
+
+    raw = _call_groq(
+        messages=[
+            {"role": "system", "content": CFP_ENRICH_SYSTEM},
+            {"role": "user", "content": prompt},
+        ],
+        max_tokens=500,
+        temperature=0.15,
+    )
+    parsed = _parse_json(raw)
+
+    if parsed and isinstance(parsed, dict):
+        item["summary"] = str(parsed.get("summary", item.get("summary", "")))[:500]
+        try:
+            item["score"] = max(1, min(10, int(parsed.get("fit_score", item.get("score", 7)))))
+        except Exception:
+            pass
+        item["priority"] = "HIGH" if item["score"] >= 8 else ("MEDIUM" if item["score"] >= 5 else "LOW")
+        item["reasoning"] = str(parsed.get("fit_reasoning", item.get("reasoning", "")))[:240]
+        item["deadline"] = parsed.get("submission_deadline") or item.get("deadline")
+        item["cfp_conference_date"] = parsed.get("conference_date", "TBA")
+        item["cfp_location"] = parsed.get("venue_location", item.get("cfp_venue", "TBD"))
+        item["cfp_submission_type"] = parsed.get("submission_type", "Unknown")
+        item["cfp_fee"] = parsed.get("paper_fee", "Unknown — check official site")
+        item["cfp_action"] = parsed.get("action", "Monitor official site for CFP announcement")
+
+    return item
+
+
+def enrich_cfp_all(cfp_items):
+    """Enrich all CFP target items with conference-specific AI analysis."""
+    total = len(cfp_items)
+    print(f"    Enriching {total} CFP items...")
+    for idx, item in enumerate(cfp_items, start=1):
+        print(f"    [{idx:02d}/{total}] {item.get('cfp_name', item['title'][:40])}...")
+        enrich_cfp_item(item)
+        if idx < total:
+            time.sleep(1.5)
+    return sorted(cfp_items, key=lambda x: x.get("score", 0), reverse=True)
