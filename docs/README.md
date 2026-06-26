@@ -1,12 +1,17 @@
-# RoboWatch Documentation
+Getting Started
 
-Documentation index.
+Installation
 
-## Contents
+Quick Start
 
-- Installation
-- Configuration
-- Workflow
-- Deployment
-- Architecture
-- FAQ
+Architecture
+
+Configuration
+
+Deployment
+
+Development Guide
+
+FAQ
+
+Troubleshooting
