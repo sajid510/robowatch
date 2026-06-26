@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+title: RoboWatch
+message: "If you use RoboWatch in your research, please cite it."
+type: software
+
+authors:
+  - family-names: Sajid
+    given-names: Sadnan
+
+version: 1.0.0
+
+date-released: 2026-06-26
+
+repository-code: https://github.com/sajid510/robowatch
+
+license: MIT
