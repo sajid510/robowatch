@@ -14,6 +14,7 @@ from src.fallback_builder import build_fallback_report
 from src.cfp_tracker import fetch_all_cfp_targets
 from src.mailer import send_report, build_email
 from src.sample_data import sample_items
+from src.learning import LearningMemory, DEFAULT_MEMORY_FILE
 
 
 def print_section(title):
@@ -22,7 +23,7 @@ def print_section(title):
     print(f"{'='*55}")
 
 
-def collect_items(offline=False, max_items=None):
+def collect_items(offline=False, max_items=None, memory=None):
     """Run steps 1-2 of the pipeline: fetch, deduplicate, recency filter."""
     if offline:
         print("  [OFFLINE] Using bundled sample data (no network access)")
@@ -43,6 +44,13 @@ def collect_items(offline=False, max_items=None):
         recent = filter_recent(deduped, days=14)
         print(f"  After extended filter: {len(recent)}")
 
+    if memory is not None:
+        before = len(recent)
+        unseen = memory.filter_unseen(recent)
+        print(f"  After learning filter (previously seen dropped): "
+              f"{before} → {len(unseen)}")
+        recent = unseen
+
     if max_items:
         recent = recent[:max_items]
         print(f"  Capped to {max_items} items for this run")
@@ -50,7 +58,7 @@ def collect_items(offline=False, max_items=None):
     return recent
 
 
-def analyze_items(recent, offline=False):
+def analyze_items(recent, offline=False, personalization=None):
     """Run steps 3-6: AI filter, enrich, narrative (with fallback)."""
     # Split CFP RSS items from general items early
     general_items = [i for i in recent if i.get("category") != "cfp"]
@@ -67,8 +75,11 @@ def analyze_items(recent, offline=False):
 
     # ── STEP 3: AI FILTER (general + cfp rss) ────────────────
     print_section("STEP 3/8 — AI Relevance Filtering (Groq)")
-    filtered_general = ai_filter_all(general_items)
-    filtered_cfp_rss = ai_filter_all(cfp_rss_items) if cfp_rss_items else []
+    filtered_general = ai_filter_all(general_items, personalization=personalization)
+    filtered_cfp_rss = (
+        ai_filter_all(cfp_rss_items, personalization=personalization)
+        if cfp_rss_items else []
+    )
     if not offline:
         time.sleep(2)
 
@@ -90,7 +101,7 @@ def analyze_items(recent, offline=False):
 
     # ── STEP 6: AI NARRATIVE ─────────────────────────────────
     print_section("STEP 6/8 — AI Report Narrative (Gemini 2.5 Flash)")
-    narrative_html = generate_narrative(all_enriched)
+    narrative_html = generate_narrative(all_enriched, personalization=personalization)
 
     if narrative_html:
         print("  ✓ Gemini narrative generated successfully")
@@ -158,7 +169,8 @@ def write_report(report_body, stats, item_count, output_dir):
     return str(out)
 
 
-def run(offline=False, dry_run=True, output_dir="output", max_items=None):
+def run(offline=False, dry_run=True, output_dir="output", max_items=None,
+        memory_file=DEFAULT_MEMORY_FILE, feedback=None, learn=True):
     start_time = time.time()
 
     print("\n" + "🤖 " * 20)
@@ -166,26 +178,63 @@ def run(offline=False, dry_run=True, output_dir="output", max_items=None):
     print("  " + datetime.now().strftime("%A, %B %d, %Y at %H:%M UTC"))
     print("🤖 " * 20)
 
+    # ── STEP 0: LEARNING MEMORY ───────────────────────────────
+    print_section("STEP 0/9 — Learning Memory")
+    memory = LearningMemory(path=memory_file)
+    feedback_applied = 0
+    if feedback:
+        pairs = memory.parse_feedback_spec(feedback)
+        feedback_applied += len(memory.apply_feedback_pairs(pairs))
+        print(f"  Applied {feedback_applied} inline feedback signal(s)")
+    feedback_applied += len(memory.apply_feedback_file("feedback.txt"))
+    if feedback_applied:
+        print(f"  Total feedback applied this run: {feedback_applied}")
+
+    personalization = memory.personalization_note()
+    print(f"  Personalization: {personalization[:160]}")
+    print(f"  Memory stats: {memory.stats()}")
+
     # ── STEP 1: COLLECT ──────────────────────────────────────
-    print_section("STEP 1/8 — Data Collection")
-    recent = collect_items(offline=offline, max_items=max_items)
+    print_section("STEP 1/9 — Data Collection")
+    recent = collect_items(offline=offline, max_items=max_items,
+                           memory=None if offline else memory)
 
     # ── STEPS 2-6: ANALYZE ───────────────────────────────────
-    all_enriched, report_body = analyze_items(recent, offline=offline)
+    all_enriched, report_body = analyze_items(
+        recent, offline=offline, personalization=personalization
+    )
 
     # ── STEP 7: DELIVER ──────────────────────────────────────
     if dry_run:
-        print_section("STEP 7/8 — Dry-Run (no email sent)")
+        print_section("STEP 7/9 — Dry-Run (no email sent)")
         stats = summarize(all_enriched, True, round(time.time() - start_time, 1))
-        return write_report(report_body, stats, len(all_enriched), output_dir)
+        stats["feedback_applied"] = feedback_applied
+        stats["personalization"] = personalization
+        result = write_report(report_body, stats, len(all_enriched), output_dir)
     else:
-        print_section("STEP 7/8 — Multi-Email Delivery")
+        print_section("STEP 7/9 — Multi-Email Delivery")
         success = send_report(report_body, item_count=len(all_enriched))
         stats = summarize(all_enriched, success, round(time.time() - start_time, 1))
-        if not dry_run and os.environ.get("GITHUB_ACTIONS"):
+        stats["feedback_applied"] = feedback_applied
+        stats["personalization"] = personalization
+        if os.environ.get("GITHUB_ACTIONS"):
             output_dir = os.environ.get("GITHUB_WORKSPACE", ".")
             write_report(report_body, stats, len(all_enriched), output_dir)
-        return success
+        result = success
+
+    # ── STEP 8: LEARN ────────────────────────────────────────
+    print_section("STEP 8/9 — Learning Update")
+    if learn and not offline:
+        memory.note_run(len(all_enriched))
+        memory.save()
+        print(f"  Memory saved to {memory.path} (seen={len(memory.data['seen'])}, "
+              f"events={len(memory.data['events'])})")
+    else:
+        print("  [OFFLINE or --no-learn] Memory not persisted (read-only this run)")
+
+    elapsed = round(time.time() - start_time, 1)
+    print(f"\n  ✅ Total time: {elapsed}s")
+    return result
 
 
 def main():
@@ -221,6 +270,19 @@ def main():
         "--max-items", type=int, default=None,
         help="Cap the number of items processed (useful for testing).",
     )
+    parser.add_argument(
+        "--memory-file", default=DEFAULT_MEMORY_FILE,
+        help="Path to the learning-memory JSON file (default: memory/memory.json).",
+    )
+    parser.add_argument(
+        "--feedback", default=None,
+        help="Inline feedback, e.g. --feedback 'research:1,industry:-0.5' "
+             "teaches category preferences.",
+    )
+    parser.add_argument(
+        "--no-learn", action="store_true",
+        help="Do not persist learning memory after this run.",
+    )
     args = parser.parse_args()
 
     exit_code = run(
@@ -228,6 +290,9 @@ def main():
         dry_run=not args.send,
         output_dir=args.output_dir,
         max_items=args.max_items,
+        memory_file=args.memory_file,
+        feedback=args.feedback,
+        learn=not args.no_learn,
     )
     raise SystemExit(0 if exit_code not in (False, None) else 1)
 

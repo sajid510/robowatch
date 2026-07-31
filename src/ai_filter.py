@@ -90,7 +90,7 @@ def parse_json_response(raw_text):
         return None
 
 
-def ai_filter_batch(batch):
+def ai_filter_batch(batch, personalization=None):
     """Filter a batch of up to 10 items using Groq."""
     numbered_items = "\n".join(
         f'{i}. [{item["category"].upper()}] TITLE: {item["title"]} | '
@@ -100,9 +100,16 @@ def ai_filter_batch(batch):
 
     prompt = f"Filter these {len(batch)} robotics news items:\n\n{numbered_items}"
 
+    system = FILTER_SYSTEM
+    if personalization:
+        system += (
+            "\n\nPERSONALIZATION (learned from reader behaviour — weight your "
+            f"keep/discard decisions accordingly):\n{personalization}"
+        )
+
     raw = call_groq(
         messages=[
-            {"role": "system", "content": FILTER_SYSTEM},
+            {"role": "system", "content": system},
             {"role": "user", "content": prompt}
         ],
         max_tokens=600,
@@ -118,7 +125,7 @@ def ai_filter_batch(batch):
     return {d["index"]: d for d in decisions if "index" in d}
 
 
-def ai_filter_all(items):
+def ai_filter_all(items, personalization=None):
     """Run AI filtering on all items in batches of 10."""
     if not os.environ.get("GROQ_API_KEY"):
         print("    [SKIP] GROQ_API_KEY not set — keeping all items (no AI filter)")
@@ -137,7 +144,7 @@ def ai_filter_all(items):
         print(f"    Batch {batch_num + 1}/{total_batches} "
               f"(items {start + 1}–{start + len(batch)})...")
 
-        decisions = ai_filter_batch(batch)
+        decisions = ai_filter_batch(batch, personalization=personalization)
 
         for local_idx, item in enumerate(batch):
             decision = decisions.get(local_idx, {"keep": True, "reason": "no decision"})

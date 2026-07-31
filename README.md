@@ -30,6 +30,10 @@ noise.
 6. **Narrates** the whole week with **Gemini 2.5 Flash** into a polished
    9-section HTML email — with a deterministic fallback template if the LLM fails.
 7. **Delivers** via Gmail SMTP to every address in `subscribers.txt`.
+8. **Self-learns every week** — remembers what you've already seen, learns your
+   category preferences from feedback (`feedback.txt` / `--feedback`), and
+   injects them into the AI filter + narrator so the digest gets more
+   personalized over time. Memory persists in the repo, free.
 
 **Sample output:** see [`examples/sample-report.html`](examples/sample-report.html).
 
@@ -98,6 +102,15 @@ Actions artifact.
 | `--max-items N` | Cap the number of items processed |
 | `--output-dir DIR` | Destination for dry-run artifacts (default `output/`) |
 
+### Learning flags
+
+| Flag | Behaviour |
+|---|---|
+| `--memory-file PATH` | Learning-memory JSON path (default `memory/memory.json`) |
+| `--feedback "cat:delta,…"` | Teach category preferences inline, e.g. `"research:1,industry:-0.5"` |
+| `--no-learn` | Don't persist memory after this run |
+| `feedback.txt` | Commit lines like `research,1` — applied on every run |
+
 ---
 
 ## 🗂 Repository structure
@@ -105,7 +118,7 @@ Actions artifact.
 ```
 robowatch/
 ├── src/
-│   ├── main.py              # CLI + pipeline orchestration (8 steps)
+│   ├── main.py              # CLI + pipeline orchestration (9 steps)
 │   ├── fetchers.py          # RSS fetch, dedupe, recency filter
 │   ├── ai_filter.py         # Groq relevance filtering
 │   ├── ai_enricher.py       # Groq enrichment + CFP-specific analysis
@@ -113,13 +126,16 @@ robowatch/
 │   ├── fallback_builder.py  # deterministic fallback HTML report
 │   ├── cfp_tracker.py       # target-conference tracking + news lookup
 │   ├── mailer.py            # email assembly + Gmail SMTP delivery
+│   ├── learning.py          # self-learning memory + personalization
 │   └── sample_data.py       # offline demo data
+├── memory/memory.json       # learned preferences + seen items (auto-committed)
+├── feedback.txt             # teach preferences (commit lines like `research,1`)
 ├── config/sources.yaml      # RSS feed definitions
 ├── examples/                # generated sample report
 ├── docs/                    # getting started, deployment, AI pipeline, …
 ├── architecture/            # system design documents
 ├── assets/architecture.svg  # pipeline diagram
-├── tests/                   # pytest suite (35+ tests)
+├── tests/                   # pytest suite (50+ tests)
 └── Dockerfile               # containerized run
 ```
 
@@ -142,6 +158,7 @@ pipeline** run. CI runs it on Python 3.10–3.12.
 
 - [Documentation index](docs/README.md)
 - [Getting started](docs/01-getting-started.md) · [Installation](docs/02-installation.md) · [Quick start](docs/03-quick-start.md)
+- [Self-learning & personalization](docs/16-self-learning.md)
 - [Architecture](architecture/01-system-overview.md) · [Data flow](architecture/03-data-flow.md)
 - [AI pipeline](docs/11-ai-pipeline.md) · [CFP tracking](docs/08-workflows.md) · [Email report](docs/10-email-report.md)
 - [Deployment](docs/09-deployment.md) · [Troubleshooting](docs/14-troubleshooting.md)

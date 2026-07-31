@@ -28,6 +28,7 @@ with Gemini, and emails a prioritized briefing to its subscribers.
 | [13 — FAQ](13-faq.md) | Common questions |
 | [14 — Troubleshooting](14-troubleshooting.md) | Fixing common failures |
 | [15 — Development guide](15-development-guide.md) | Contributing, testing, extending |
+| [16 — Self-learning](16-self-learning.md) | Memory, feedback, personalization |
 
 ## Architecture documents
 

@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "seen": {},
+  "weights": {
+    "industry": 0.0,
+    "research": 0.0,
+    "competition": 0.0,
+    "conference": 0.0,
+    "fellowship": 0.0,
+    "bangladesh": 0.0,
+    "cfp": 0.0
+  },
+  "events": [],
+  "stats": {
+    "runs": 0,
+    "items_shown": 0,
+    "feedback_events": 0
+  },
+  "created_at": "2026-07-31T00:00:00.000Z",
+  "updated_at": "2026-07-31T00:00:00.000Z"
+}

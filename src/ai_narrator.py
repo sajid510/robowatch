@@ -125,7 +125,7 @@ def build_payload(items):
     return json.dumps(payload, ensure_ascii=False)
 
 
-def generate_narrative(items):
+def generate_narrative(items, personalization=None):
     """Use Gemini 2.5 Flash to write the full report narrative."""
     api_key = os.environ.get("GEMINI_API_KEY", "")
     if not api_key:
@@ -147,13 +147,20 @@ def generate_narrative(items):
         f"Items data:\n{items_json}"
     )
 
+    system_text = NARRATOR_SYSTEM
+    if personalization:
+        system_text += (
+            "\n\nPERSONALIZATION (learned from reader behaviour — follow these "
+            f"preferences when choosing emphasis and the top pick):\n{personalization}"
+        )
+
     try:
         response = httpx.post(
             url,
             headers={"Content-Type": "application/json"},
             json={
                 "system_instruction": {
-                    "parts": [{"text": NARRATOR_SYSTEM}]
+                    "parts": [{"text": system_text}]
                 },
                 "contents": [
                     {"parts": [{"text": prompt}]}

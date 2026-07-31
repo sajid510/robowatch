@@ -1,0 +1,13 @@
+# RoboWatch feedback file — teach the digest your preferences.
+# Lines are applied on every run and merged into the learning memory.
+#
+# Simple form (category, weight-delta):
+#   research,1
+#   industry,-0.5
+#
+# Detailed form (url, category, weight-delta):
+#   https://spectrum.ieee.org/example,research,1
+#
+# Positive delta = you want MORE of that category.
+# Negative delta = you want LESS of that category.
+# Weights are clamped to [-5, +5].

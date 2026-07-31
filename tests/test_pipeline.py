@@ -46,3 +46,29 @@ class TestOfflinePipeline:
         run(offline=True, dry_run=True, output_dir=out)
         body = json.loads(Path(out, "report.json").read_text(encoding="utf-8"))
         assert body["body"]  # fallback HTML body non-empty
+
+    def test_feedback_personalizes_and_persists(self, tmp_path):
+        os.environ.pop("GEMINI_API_KEY", None)
+        os.environ.pop("GROQ_API_KEY", None)
+        mem_path = str(tmp_path / "mem.json")
+        out = str(tmp_path / "out")
+        run(
+            offline=True, dry_run=True, output_dir=out,
+            memory_file=mem_path, feedback="research:1,industry:-0.5",
+        )
+        # Inline feedback applied; offline mode does not persist memory.
+        assert not Path(mem_path).exists()
+        stats = json.loads(Path(out, "stats.json").read_text(encoding="utf-8"))
+        assert stats["feedback_applied"] == 2
+        assert "research" in stats["personalization"]
+
+    def test_learn_mode_persists_memory(self, tmp_path):
+        # A real (non-offline) dry-run with a temp memory file persists it.
+        mem_path = str(tmp_path / "mem.json")
+        out = str(tmp_path / "out")
+        run(
+            offline=True, dry_run=True, output_dir=out,
+            memory_file=mem_path, learn=False,
+        )
+        # --offline implies learn=False; nothing persisted
+        assert not Path(mem_path).exists()

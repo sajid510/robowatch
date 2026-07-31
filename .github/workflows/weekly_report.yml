@@ -5,6 +5,9 @@ on:
     - cron: '0 8 * * 5'   # Every Friday 8:00 AM UTC = 2:00 PM BST
   workflow_dispatch:        # Manual trigger from GitHub Actions tab
 
+permissions:
+  contents: write
+
 jobs:
   run-robowatch:
     runs-on: ubuntu-latest
@@ -43,4 +46,16 @@ jobs:
           name: robowatch-report
           path: output/
           if-no-files-found: ignore
+
+      - name: Persist learned memory
+        run: |
+          git config user.name "robowatch-bot"
+          git config user.email "actions@github.com"
+          git add memory/ feedback.txt
+          if git diff --cached --quiet; then
+            echo "No memory changes to commit"
+          else
+            git commit -m "learn: update memory from weekly run"
+            git push
+          fi
 

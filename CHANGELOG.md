@@ -4,6 +4,25 @@ All notable changes to RoboWatch are documented in this file.
 
 ---
 
+## [1.2.0] - 2026-07-31
+
+### Added
+
+- **Self-learning memory** (`src/learning.py`) — the digest now learns every
+  week: remembers seen articles (no repeats), tracks category preferences from
+  feedback, and accumulates run stats.
+- **Personalization** — learned category weights are injected into the Groq
+  filter prompt and the Gemini narrator prompt, so the digest gets more
+  customized with use.
+- **Feedback channels** — `--feedback "cat:delta,…"` CLI flag and a committed
+  `feedback.txt` file (lines like `research,1`) applied on every run.
+- **Memory persistence** — `memory/memory.json` is committed back to the repo
+  by the weekly GitHub Actions run (free, no database).
+- Docs: `docs/16-self-learning.md`, updated README / config / workflow docs.
+- Tests: 50+ tests including the learning module and pipeline integration.
+
+---
+
 ## [1.1.0] - 2026-07-31
 
 ### Added
