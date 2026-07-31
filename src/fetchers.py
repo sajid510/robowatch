@@ -1,8 +1,10 @@
 import feedparser
-import httpx
+import re
 from datetime import datetime, timezone, timedelta
 import yaml
 from pathlib import Path
+
+_PUNCT = re.compile(r"[^\w\s]")
 
 
 def load_sources():
@@ -43,7 +45,6 @@ def fetch_rss(url, category):
                 continue
 
             # Clean HTML from summary
-            import re
             summary = re.sub(r"<[^>]+>", " ", summary)
             summary = re.sub(r"\s+", " ", summary).strip()
 
@@ -77,25 +78,41 @@ def fetch_all():
     return all_items
 
 
+def _title_key(title):
+    """Normalize a title for near-duplicate detection."""
+    return _PUNCT.sub(" ", title.lower()).strip()
+
+
 def deduplicate(items):
-    """Remove duplicate items by URL."""
+    """Remove duplicate items by URL and near-duplicate titles.
+
+    Two titles count as duplicates when one is a prefix of the other and the
+    longer one is at least 20 characters, which catches reposts that append
+    suffixes such as "— update" or ", part 2" while keeping distinct headlines.
+    """
     seen_urls = set()
-    seen_titles = set()
+    seen_titles = []
     unique = []
 
     for item in items:
         url_key = item["url"].split("?")[0]  # ignore query params
-        title_key = item["title"][:60].lower()
+        title_key = _title_key(item["title"])
 
-        if url_key not in seen_urls and title_key not in seen_titles:
+        prefix_dup = False
+        for seen in seen_titles:
+            if len(title_key) >= 20 and (title_key.startswith(seen) or seen.startswith(title_key)):
+                prefix_dup = True
+                break
+
+        if url_key not in seen_urls and not prefix_dup:
             seen_urls.add(url_key)
-            seen_titles.add(title_key)
+            seen_titles.append(title_key)
             unique.append(item)
 
     return unique
 
 
 def filter_recent(items, days=8):
-    """Keep only items from the last N days."""
+    """Keep only items from the last N days (items without dates are kept)."""
     cutoff = datetime.now(timezone.utc) - timedelta(days=days)
-    return [item for item in items if item["published_date"] >= cutoff]
+    return [item for item in items if item.get("published_date", cutoff) >= cutoff]

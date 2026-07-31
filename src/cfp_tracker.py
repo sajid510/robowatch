@@ -5,6 +5,7 @@ Tracks target conferences for Team Supersonic's autonomous robot project.
 """
 
 import feedparser
+import re
 from datetime import datetime, timezone
 
 # ── PROJECT CONTEXT ───────────────────────────────────────────────────────────
@@ -172,7 +173,6 @@ def fetch_all_cfp_targets():
         news_snippet = ""
         news_url = _build_search_url(conf)
         if latest:
-            import re
             snippet = re.sub(r"<[^>]+>", " ", latest.get("summary", ""))
             snippet = re.sub(r"\s+", " ", snippet).strip()
             news_snippet = f" Latest news: {latest.get('title', '')}. {snippet[:300]}"

@@ -1,4 +1,4 @@
-name: RoboWatch AI — Weekly Intelligence Report
+name: "RoboWatch AI — Weekly Intelligence Report"
 
 on:
   schedule:
@@ -35,4 +35,12 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-        run: python -m src.main
+        run: python -m src.main --send --output-dir output
+
+      - name: Upload generated report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: robowatch-report
+          path: output/
+          if-no-files-found: ignore
+

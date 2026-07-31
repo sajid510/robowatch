@@ -114,6 +114,16 @@ def load_subscribers():
     return emails
 
 
+def build_email(html_body, item_count=0):
+    """Build the full HTML email (wrapper + CSS + body)."""
+    return EMAIL_WRAPPER.format(
+        css=EMAIL_CSS,
+        date=date.today().strftime("%B %d, %Y"),
+        body=html_body,
+        count=item_count
+    )
+
+
 def send_report(html_body, item_count=0):
     """Send the report to all subscribers via Gmail SMTP."""
     sender = os.environ.get("GMAIL_ADDRESS", "")
@@ -129,12 +139,7 @@ def send_report(html_body, item_count=0):
         return False
 
     # Build full HTML email
-    full_html = EMAIL_WRAPPER.format(
-        css=EMAIL_CSS,
-        date=date.today().strftime("%B %d, %Y"),
-        body=html_body,
-        count=item_count
-    )
+    full_html = build_email(html_body, item_count=item_count)
 
     subject = (
         f"🤖 RoboWatch — Robotics Intelligence | "

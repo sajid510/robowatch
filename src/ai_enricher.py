@@ -142,10 +142,11 @@ def enrich_item(item):
 def enrich_all(items):
     enriched = []
     total = len(items)
+    no_api = not os.environ.get("GROQ_API_KEY")
     for idx, item in enumerate(items, start=1):
         print(f"    Enriching item {idx}/{total}...")
         enriched.append(enrich_item(item))
-        if idx < total:
+        if idx < total and not no_api:
             time.sleep(1)
 
     enriched.sort(key=lambda i: (i.get("priority") != "HIGH", -(i.get("score") or 0)))
@@ -223,10 +224,11 @@ def enrich_cfp_item(item):
 def enrich_cfp_all(cfp_items):
     """Enrich all CFP target items with conference-specific AI analysis."""
     total = len(cfp_items)
+    no_api = not os.environ.get("GROQ_API_KEY")
     print(f"    Enriching {total} CFP items...")
     for idx, item in enumerate(cfp_items, start=1):
         print(f"    [{idx:02d}/{total}] {item.get('cfp_name', item['title'][:40])}...")
         enrich_cfp_item(item)
-        if idx < total:
+        if idx < total and not no_api:
             time.sleep(1.5)
     return sorted(cfp_items, key=lambda x: x.get("score", 0), reverse=True)

@@ -1,0 +1,13 @@
+services:
+  robowatch:
+    build: .
+    environment:
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GMAIL_ADDRESS=${GMAIL_ADDRESS}
+      - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD}
+    volumes:
+      # Mount a directory to capture dry-run artifacts locally
+      - ./output:/app/output
+    # Dry-run by default; use `docker compose run --rm robowatch --send`
+    command: ["--offline", "--dry-run", "--output-dir", "/app/output"]

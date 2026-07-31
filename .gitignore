@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# RoboWatch run artifacts (local dry-runs)
+output/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

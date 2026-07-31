@@ -120,6 +120,12 @@ def ai_filter_batch(batch):
 
 def ai_filter_all(items):
     """Run AI filtering on all items in batches of 10."""
+    if not os.environ.get("GROQ_API_KEY"):
+        print("    [SKIP] GROQ_API_KEY not set — keeping all items (no AI filter)")
+        for item in items:
+            item["filter_reason"] = "no ai filter"
+        return items
+
     kept = []
     batch_size = 10
     total_batches = (len(items) + batch_size - 1) // batch_size

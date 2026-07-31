@@ -180,7 +180,3 @@ def generate_narrative(items):
     except Exception as e:
         print(f"    [ERROR] Gemini narrative failed: {e}")
         return None
-
-def new_func():
-    api_key = os.environ.get("GEMINI_API_KEY", "")
-    return api_key
